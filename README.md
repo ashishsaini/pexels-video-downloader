@@ -1,6 +1,15 @@
 ## Pexels Downloader
 
-### Downloads the pexels video from pexels website url
+This is a simple script to download pexels videos when provided the URL of the video, this project uses [Pexels API](https://www.pexels.com/api/documentation/) to download the videos, you need to register and get your API key which is very straight forward. 
+
+This script does following things:
+
+1. Extract `video id` from provided URL
+2. Get `video data` from pexels get video API, which returns the different resolutions available for the video.
+3. Select the video resolution according to the resolution provided in `resolution`, if required resolution is not available then select the highest resolution (max_resolution configuration also available).
+4. Download the video and store it in provided `downloads_dir` 
+
+### Setup
 
 ```python
 pip install -r requirements.txt
@@ -58,10 +67,3 @@ self.downloads_dir = "/tmp/"
 self.log_path = "logs/pexels_downloader.log"
 
 ```
-
-
-
-
-
-
-

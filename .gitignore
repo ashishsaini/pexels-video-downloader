@@ -4,3 +4,4 @@ py3/
 downloads/
 logs/
 *.log
+.DS_Store
