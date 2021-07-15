@@ -1,0 +1,6 @@
+.env
+py3/
+*.pyc
+downloads/
+logs/
+*.log
