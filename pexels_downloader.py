@@ -15,7 +15,7 @@ import logging
 
 class PexelsDownloader:
 
-    def __init__(self) -> None:
+    def __init__(self, log_path="pexels_downloader.log") -> None:
         self.resolution = 1080
         self.pexels_api_url = "https://api.pexels.com/videos/videos/"
         self.pexels_api_key = os.environ.get("PEXELS_API_KEY")
@@ -23,7 +23,7 @@ class PexelsDownloader:
         self.max_resolution = 1440
         self.downloads_dir = "/tmp/"
         self.trace_id = str(uuid.uuid4())
-        self.log_path = 'logs/pexels_downloader.log'
+        self.log_path = log_path
         logging.basicConfig(filename=self.log_path,format=f'%(asctime)s | %(levelname)s | {self.trace_id} | %(message)s', level=logging.INFO)
 
 
