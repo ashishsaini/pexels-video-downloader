@@ -166,7 +166,7 @@ class PexelsDownloader:
 
     def _video_search_request(self, query):
         # request the pexels APi for video
-        url = f"{self.pexels_api_url}search/?query={query}&per_page=1&orientation=landscape&size=medium"
+        url = f"{self.pexels_api_url}search/?query={query}&per_page=20&orientation=landscape&size=medium"
         headers = {"Authorization": self.pexels_api_key}
         
         try:
