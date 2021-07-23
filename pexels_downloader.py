@@ -11,13 +11,13 @@ import requests
 import os
 import uuid
 import logging
-
+import random
 
 class PexelsDownloader:
 
     def __init__(self, log_path="pexels_downloader.log") -> None:
         self.resolution = 1080
-        self.pexels_api_url = "https://api.pexels.com/videos/videos/"
+        self.pexels_api_url = "https://api.pexels.com/videos/"
         self.pexels_api_key = os.environ.get("PEXELS_API_KEY")
         self.timeout = 30
         self.max_resolution = 1440
@@ -35,7 +35,7 @@ class PexelsDownloader:
         return True
 
     def _get_video_by_id(self, id):
-        url = f"{self.pexels_api_url}{id}"
+        url = f"{self.pexels_api_url}videos/{id}"
         headers = {"Authorization": self.pexels_api_key}
         try:
             result = requests.get(url, headers=headers, timeout=self.timeout)
@@ -138,3 +138,49 @@ class PexelsDownloader:
         logging.info(f"{self.trace_id} | got url: {pexels_url}")
         id = self._get_id_from_url(pexels_url)
         return self._run(id)
+
+    def search_and_download_video(self, query):
+        # Public endpoint to search the video
+        search_result_raw = self._video_search_request(query)
+
+        try:
+            search_result = json.loads(search_result_raw)
+        except Exception as e:
+            logging.warning(f"Error: Unable to search video : {query}")
+            logging.error(f"{e}")
+            exit()
+        
+        if "videos" not in search_result or len(search_result['videos']) < 1:
+            return False
+
+        # randomly select video from search result until mateched requirement
+        selected_video = {}
+        for i in range(0,9):
+            index = random.randint(0,len(search_result['videos'])-1)
+            selected_video = self._select_video(search_result['videos'][index], self.resolution)
+            if selected_video:
+                break
+
+        # download file in requested directory
+        filename = str(uuid.uuid4())+".mp4"
+        video_path = self._download_video(selected_video['link'], self.downloads_dir, filename)
+
+        filesize = str(os.path.getsize(video_path))
+        logging.info(f"Downloaded file size : {filesize}") 
+
+        return video_path
+
+
+
+    def _video_search_request(self, query):
+        # request the pexels APi for video
+        url = f"{self.pexels_api_url}search/?query={query}&per_page=10&orientation=landscape&size=medium"
+        headers = {"Authorization": self.pexels_api_key}
+        
+        try:
+            result = requests.get(url, headers=headers, timeout=self.timeout)
+        except Exception as e:
+            logging.warning(f"Error: unable to get video from video id")
+            logging.error(f"{e}")
+            exit()
+        return result.text
