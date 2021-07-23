@@ -120,13 +120,7 @@ class PexelsDownloader:
             logging.error(f"Unable to get required file, some error")
             exit()
 
-        filename = str(uuid.uuid4())+".mp4"
-        video_path = self._download_video(selected_video['link'], self.downloads_dir, filename)
-
-        filesize = str(os.path.getsize(video_path))
-        logging.info(f"Downloaded file size : {filesize}") 
-
-        return video_path
+        return selected_video['link']
 
 
     def download(self, pexels_id):
@@ -161,7 +155,7 @@ class PexelsDownloader:
                 selected_video_data = search_result['videos'][index]
                 break
 
-        return selected_video_data
+        return selected_video_data['id']
 
 
 
