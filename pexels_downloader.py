@@ -69,7 +69,7 @@ class PexelsDownloader:
 
         return os.path.join(downloads_dir, filename)
 
-    def _select_video(self, video_data, req_resolution):
+    def _select_video_type(self, video_data, req_resolution):
         # selects required resolution from various available resolutions
         if "video_files" not in video_data:
             logging.error(f"Error: Unexpected response when getting data from: {video_data}")
@@ -112,7 +112,7 @@ class PexelsDownloader:
 
         logging.info(f"{self.trace_id} | got response from pexels : "+json.dumps(video_data))    
         
-        selected_video = self._select_video(video_data, self.resolution)
+        selected_video = self._select_video_type(video_data, self.resolution)
         logging.info(f"{self.trace_id} | selected video : "+json.dumps(selected_video))    
 
         if not selected_video:
@@ -153,14 +153,15 @@ class PexelsDownloader:
             return False
 
         # randomly select video from search result until mateched requirement
-        selected_video = {}
+        selected_video_data = {}
         for i in range(0,9):
             index = random.randint(0,len(search_result['videos'])-1)
-            selected_video = self._select_video(search_result['videos'][index], self.resolution)
+            selected_video = self._select_video_type(search_result['videos'][index], self.resolution)
             if selected_video:
+                selected_video_data = search_result['videos'][index]
                 break
 
-        return selected_video
+        return selected_video_data
 
 
 
