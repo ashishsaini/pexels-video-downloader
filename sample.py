@@ -21,5 +21,5 @@ if __name__ == "__main__":
     pexels_d = PexelsDownloader('logs/pexels_downloader.log')
     pexels_d.downloads_dir = "downloads/"
     pexels_d.resolution = 1080
-    result = pexels_d.search_and_download_video("forest")
+    result = pexels_d.search_video("forest")
     print(result)

@@ -139,7 +139,7 @@ class PexelsDownloader:
         id = self._get_id_from_url(pexels_url)
         return self._run(id)
 
-    def search_and_download_video(self, query):
+    def search_video(self, query):
         # Public endpoint to search the video
         search_result_raw = self._video_search_request(query)
 
@@ -161,14 +161,7 @@ class PexelsDownloader:
             if selected_video:
                 break
 
-        # download file in requested directory
-        filename = str(uuid.uuid4())+".mp4"
-        video_path = self._download_video(selected_video['link'], self.downloads_dir, filename)
-
-        filesize = str(os.path.getsize(video_path))
-        logging.info(f"Downloaded file size : {filesize}") 
-
-        return video_path
+        return selected_video
 
 
 
