@@ -93,7 +93,7 @@ class PexelsDownloader:
         return selected_video
 
 
-    def _get_id_from_url(self, pexels_url):
+    def get_id_from_url(self, pexels_url):
         id = pexels_url.split("-")[-1].replace("/", "")
         
         if len(id) < 3 or len(id) > 10:
@@ -129,15 +129,14 @@ class PexelsDownloader:
         return video_path
 
 
-    def download(self, pexels_url):
+    def download(self, pexels_id):
         # public function, to be called from
         if not self._check_env("PEXELS_API_KEY"):
             logging.error(f"Error: required Pexels API key is not set in environment variable")
             exit()
 
-        logging.info(f"{self.trace_id} | got url: {pexels_url}")
-        id = self._get_id_from_url(pexels_url)
-        return self._run(id)
+        logging.info(f"{self.trace_id} | got url: {pexels_id}")
+        return self._run(pexels_id)
 
     def search_video(self, query):
         # Public endpoint to search the video
@@ -167,7 +166,7 @@ class PexelsDownloader:
 
     def _video_search_request(self, query):
         # request the pexels APi for video
-        url = f"{self.pexels_api_url}search/?query={query}&per_page=10&orientation=landscape&size=medium"
+        url = f"{self.pexels_api_url}search/?query={query}&per_page=1&orientation=landscape&size=medium"
         headers = {"Authorization": self.pexels_api_key}
         
         try:
