@@ -12,7 +12,7 @@ import os
 import uuid
 import logging
 import random
-from media_cache import MediaCache
+from .media_cache import MediaCache
 import hashlib
 
 
@@ -48,6 +48,8 @@ class ImageDownloader:
         if not search_result:
             logging.info("data not found in cache, making request to api")
             search_result = self._search_from_pexels(keyword,  cache_name)
+        else:
+            logging.info("returning result from cache")
 
         if "photos" not in search_result or len(search_result['photos']) < 1:
             return False
