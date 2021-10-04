@@ -12,6 +12,8 @@ import os
 import uuid
 import logging
 import random
+from media_cache import MediaCache
+import hashlib
 
 
 class ImageDownloader:
@@ -28,6 +30,8 @@ class ImageDownloader:
         self.log_path = log_path
         logging.basicConfig(
             filename=self.log_path, format=f'%(asctime)s | %(levelname)s | {self.trace_id} | %(message)s', level=logging.INFO)
+        self.media_cache_dir = "/tmp/"
+        self.media_cache = MediaCache(self.media_cache_dir)
 
     def _check_env(self, key):
         # check if required environment variable is set
@@ -37,15 +41,13 @@ class ImageDownloader:
         return True
 
     def get_image(self, keyword):
-        # Public endpoint to search the video
-        search_result_raw = self._image_search_request(keyword)
 
-        try:
-            search_result = json.loads(search_result_raw)
-        except Exception as e:
-            logging.warning(f"Error: Unable to search video : {keyword}")
-            logging.error(f"{e}")
-            exit()
+        cache_name = hashlib.md5(keyword.encode()).hexdigest()+"image"
+        search_result = self._search_from_cache(cache_name)
+
+        if not search_result:
+            logging.info("data not found in cache, making request to api")
+            search_result = self._search_from_pexels(keyword,  cache_name)
 
         if "photos" not in search_result or len(search_result['photos']) < 1:
             return False
@@ -57,6 +59,35 @@ class ImageDownloader:
             str(self.resolution_height)+"&w="+str(self.resolution_width)
 
         return selected_image
+
+    def _search_from_cache(self, cache_name):
+        ''' Check data in cache and return if exits '''
+        result = ""
+        try:
+            result = self.media_cache.get(cache_name)
+        except Exception as e:
+            logging.warning(
+                f"Error: Unable to search cache for video : {cache_name}")
+            logging.error(f"{e}")
+
+        return result
+
+    def _search_from_pexels(self, keyword, cache_name):
+
+        search_result = ""
+        try:
+            search_result_raw = self._image_search_request(keyword)
+            search_result = json.loads(search_result_raw)
+
+            # save to cache
+            self.media_cache.save(search_result, cache_name)
+            logging.info("data saved to cache")
+        except Exception as e:
+            logging.warning(f"Error: Unable to search video : {keyword}")
+            logging.error(f"{e}")
+            exit()
+
+        return search_result
 
     def _image_search_request(self, keyword):
         # request the pexels APi for video
